@@ -1,51 +1,40 @@
 <?php
-error_reporting(-1);
-ini_set('display_errors','On');
-header("Content-Type: text/html; charset=utf-8");
-
-if(isset($_POST['login'],$_POST['password'])) {
-    if($_POST['login'] === 'admin' && $_POST['password'] === '123') {
-        header("we");
-        exit;
-    } else {
-        $error = 'Вы неправильно ввели логин или пароль';
+  $con = mysqli_connect("localhost", "root", "", "yeticave");
+  if ($con == false) {
+    print("Ошибка подключения: " . mysqli_connect_error());
+  }
+  else {
+    print("Соединение установлено");
+    mysqli_set_charset($con, "utf8");
+    $sql_lots = "SELECT categories.name, lots.name, first_price, url, date_delection, bet_step FROM lots JOIN categories ON categories.id = lots.category_id WHERE date_delection > NOW();";
+    $result_lots = mysqli_query($con, $sql_lots);
+    if (!$result_lots) {
+      $error = mysqli_error($con);
+      print("Ошибка MySQL: " . $error);
     }
-}
-?>
+    $products = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
 
-<!doctype html>
-<html>
-<head>
-<link href="style.css" rel="stylesheet" type="text/css">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Y-Engine</title>
-</head>
-<body>
-
-<?php
-error_reporting(-1);
-ini_set('display_errors','On');
-header("Content-Type: text/html; charset=utf-8");
-
-if(isset($_POST['login'],$_POST['password'])) {
-    if($_POST['login'] === 'admin' && $_POST['password'] === '123') {
-        header("we");
-        exit;
-    } else {
-        $error = 'Вы неправильно ввели логин или пароль';
+    $sql_cat = "SELECT name FROM categories;";
+    $result_cat = mysqli_query($con, $sql_cat);
+    if (!$result_cat) {
+      $error = mysqli_error($con);
+      print("Ошибка MySQL: " . $error);
     }
-}
+    $categories = mysqli_fetch_all($result_cat, MYSQLI_ASSOC);
+
+  }
+      require_once("function.php");
+      require_once("helpers.php");
+
+$is_auth = rand(0, 1);
+
+$user_name = 'Илья';
+
+
+$content = include_template('main.php', ['categories' => $categories, 'products' => $products]);
+
+$layout_content = include_template('layout.php', ['content' => $content, 'title' => 'Главная', 'categories' => $categories, 'is_auth' => $is_auth, 'user_name' => 'Илья']);
+
+print($layout_content);
+
 ?>
-<?php if(isset($error)) { ?>
-    <div>Здравствуйте, <?=htmlspecialchars($error);?></div>
-<?php } ?>
-<form action="main.php" method="post">
-    <input type="text" name="login" placeholder="Введите логин">
-    <input type="password" name="password" placeholder="введите пароль">
-    <input type="submit" value="Войти на сайт!">
-</form>
-</body>
-</html>
-<?php
-    echo 'test1';
- ?>
